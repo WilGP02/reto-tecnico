@@ -1,0 +1,45 @@
+---
+swagger: "2.0"
+info:
+  version: "2020-12-03T07:25:41Z"
+  title: "dev-back-ms-people"
+host: "e7ic1k5rv5.execute-api.us-east-1.amazonaws.com"
+basePath: "/dev"
+schemes:
+- "https"
+paths:
+  /v1/people/{id}:
+    get:
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID para retorno de personaje."
+          required: true
+          type: "integer"
+          format: "int"
+      responses: 
+        "200":
+          description: ""
+    post:
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID creacion de personaje, consume el SWAPI."
+          required: true
+          type: "integer"
+          format: "int"
+      responses: 
+        "200":
+          description: ""
+  /v1/people-saved/{id}:
+    get:
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID para retorno de personaje guardado en DynamoDB."
+          required: true
+          type: "integer"
+          format: "int"
+      responses: 
+        "200":
+          description: ""
