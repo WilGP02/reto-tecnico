@@ -1,0 +1,91 @@
+service: back-ms-people
+
+custom:
+  logLevel:
+    prod: WARN
+    default: DEBUG
+  allowedHeaders:
+    - Accept
+    - Content-Type
+    - Content-Length
+    - Authorization
+    - X-Amz-Date
+    - X-Api-Key
+    - X-Amz-Security-Token
+    - X-Amz-User-Agent
+
+plugins:
+  - serverless-offline
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  memorySize: 128
+  timeout: 5
+  endpointType: regional
+  versionFunctions: false
+  apiGateway:
+    minimumCompressionSize: 1024
+  environment:
+    VERSION: v1
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    LOG_LEVEL: ${self:custom.logLevel.${self:provider.stage}, self:custom.logLevel.default}
+    PEOPLE_TABLE: people-${opt:stage, self:provider.stage}
+
+functions:
+  add-people:
+    handler: functions/add-people.handler
+    description: Add new people
+    events:
+      - http:
+          method: post
+          path: ${self:provider.environment.VERSION}/people
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PEOPLE_TABLE}"
+  
+  get-people:
+    handler: functions/get-people.handler
+    description: Getting people
+    events:
+      - http:
+          method: get
+          path: ${self:provider.environment.VERSION}/people
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PEOPLE_TABLE}"
+  
+  get-save-people:
+    handler: functions/get-save-people.handler
+    description: Getting people saved
+    events:
+      - http:
+          method: get
+          path: ${self:provider.environment.VERSION}/people-saved
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+        Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.PEOPLE_TABLE}"
+
+resources:
+  Resources:
+    peopleTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: people-dev
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
