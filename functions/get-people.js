@@ -11,7 +11,7 @@ const getPeople = async (event) => {
     try {
         const queryParameters = event.queryStringParameters;
         let data = await axios.get(`https://swapi.py4e.com/api/people/${queryParameters.id}`);
-
+        console.log(data)
         return {
             statusCode: 201,
             headers: util.getResponseHeaders(),

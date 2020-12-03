@@ -40,7 +40,7 @@ const addPeople = async (event) => {
             Item: item
         }).promise();
 
-        console.log(saveData);
+        console.log(item);
 
         return {
             statusCode: 201,
